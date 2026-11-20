@@ -23,10 +23,16 @@ export function weekday(ymd) {
   return new Date(Date.UTC(y, m - 1, d)).getUTCDay()
 }
 
-/** 20.11 */
+/** 20.11.2026 */
 export function dm(ymd) {
-  const { m, d } = parts(ymd)
-  return `${pad(d)}.${pad(m)}`
+  const { y, m, d } = parts(ymd)
+  return `${pad(d)}.${pad(m)}.${y}`
+}
+
+/** NOV 2026 */
+export function monthYear(ymd) {
+  const { y, m } = parts(ymd)
+  return `${BLN[m - 1]} ${y}`
 }
 
 /** Jumat, 20 November 2026 */
@@ -35,10 +41,10 @@ export function longDate(ymd) {
   return `${HARI[weekday(ymd)]}, ${d} ${BULAN[m - 1]} ${y}`
 }
 
-/** JUM 20 NOV */
+/** JUM 20 NOV 2026 */
 export function shortDate(ymd) {
-  const { m, d } = parts(ymd)
-  return `${HARI[weekday(ymd)].slice(0, 3).toUpperCase()} ${d} ${BLN[m - 1]}`
+  const { y, m, d } = parts(ymd)
+  return `${HARI[weekday(ymd)].slice(0, 3).toUpperCase()} ${d} ${BLN[m - 1]} ${y}`
 }
 
 /** Tanggal hari ini menurut zona waktu Jakarta, format yyyy-MM-dd. */

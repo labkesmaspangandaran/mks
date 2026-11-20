@@ -1,9 +1,25 @@
 import { reactive } from 'vue'
-import { getJadwal } from './api'
-import { addDays } from './date'
+import { getJadwal, DEMO } from './api'
+import { addDays, todayJakarta } from './date'
+
+const CACHE_KEY = 'mks_jadwal_cache_v1'
+
+/** Data terakhir disimpan di perangkat, jadi web langsung tampil sambil data baru dimuat. */
+function readCache() {
+  if (DEMO) return null
+  try {
+    const raw = localStorage.getItem(CACHE_KEY)
+    if (!raw) return null
+    const data = JSON.parse(raw)
+    data.server.today = todayJakarta() // status sesi dihitung ulang untuk hari ini
+    return data
+  } catch {
+    return null
+  }
+}
 
 export const store = reactive({
-  data: null,
+  data: readCache(),
   loading: false,
   error: ''
 })
@@ -11,10 +27,15 @@ export const store = reactive({
 export async function loadJadwal() {
   store.loading = true
   try {
-    store.data = await getJadwal()
+    const fresh = await getJadwal()
+    store.data = fresh
     store.error = ''
+    try {
+      if (!DEMO) localStorage.setItem(CACHE_KEY, JSON.stringify(fresh))
+    } catch { /* penyimpanan penuh/diblokir */ }
   } catch (e) {
-    store.error = e.message || 'Gagal memuat jadwal.'
+    // Jika masih ada data tersimpan, tetap tampilkan dan beri tahu dengan halus.
+    store.error = store.data ? 'Tidak bisa memperbarui data. Yang tampil adalah data terakhir.' : e.message || 'Gagal memuat jadwal.'
   } finally {
     store.loading = false
   }

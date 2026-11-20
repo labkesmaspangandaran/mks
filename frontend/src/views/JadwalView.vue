@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { store, statusOf, TAGS, nextSesi } from '../lib/store'
-import { addDays, BULAN, dm, fmtSize, parts, shortDate, toYmd, weekday } from '../lib/date'
+import { addDays, BULAN, dm, fmtSize, monthYear, parts, shortDate, toYmd, weekday } from '../lib/date'
 
 defineEmits(['go'])
 
@@ -107,6 +107,7 @@ const zoomLink = computed(() => data.value.server.zoomLink)
         >
           <span style="font-size: 11px; font-weight: 700">JUM</span>
           <span class="day">{{ parts(s.tanggal).d }}</span>
+          <span style="font-size: 10px; font-weight: 700">{{ monthYear(s.tanggal) }}</span>
           <span class="tag" style="font-size: 10px; padding: 1px 4px; color: var(--ink)" :style="{ background: tagOf(s).bg }">{{ tagOf(s).label }}</span>
         </button>
         <span v-if="!monthSesi.length" class="kicker">BELUM ADA JADWAL BULAN INI.</span>
@@ -155,7 +156,10 @@ const zoomLink = computed(() => data.value.server.zoomLink)
           :style="{ background: s.tanggal === sel ? 'var(--cream)' : '#fff' }"
           @click="pick(s.tanggal)"
         >
-          <span class="day">{{ parts(s.tanggal).d }}</span>
+          <span style="display: flex; flex-direction: column; align-items: center; width: 52px">
+            <span class="day" style="width: auto">{{ parts(s.tanggal).d }}</span>
+            <span style="font-size: 10px; font-weight: 700">{{ monthYear(s.tanggal) }}</span>
+          </span>
           <span class="names">{{ firstNames(s) }}</span>
           <span class="tag" :style="{ background: tagOf(s).bg }">{{ tagOf(s).label }}</span>
         </button>
@@ -164,12 +168,12 @@ const zoomLink = computed(() => data.value.server.zoomLink)
     </div>
 
     <section v-if="detail" class="card" aria-labelledby="det-title" style="display: flex; flex-direction: column; gap: 16px; min-width: 0">
-      <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px">
-        <div style="display: flex; flex-direction: column; gap: 4px">
+      <div style="display: flex; flex-direction: column; gap: 6px">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 10px">
           <span class="kicker">{{ shortDate(detail.tanggal) }} · {{ data.server.jamMulai || '08:30' }} WIB · ZOOM</span>
-          <h2 id="det-title" class="detail-date">{{ dm(detail.tanggal) }}</h2>
+          <span class="sticker" :style="{ background: tagOf(detail).bg }">{{ tagOf(detail).label }}</span>
         </div>
-        <span class="sticker" :style="{ background: tagOf(detail).bg }">{{ tagOf(detail).label }}</span>
+        <h2 id="det-title" class="detail-date">{{ dm(detail.tanggal) }}</h2>
       </div>
 
       <a v-if="detail.rekaman" class="btn btn-black" style="color: #fff; justify-content: space-between" :href="detail.rekaman.link" target="_blank" rel="noopener">
