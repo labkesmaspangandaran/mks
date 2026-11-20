@@ -16,7 +16,8 @@ const now = ref(nowJakartaHM())
 let timer
 onMounted(() => {
   timer = setInterval(() => (now.value = nowJakartaHM()), 10_000)
-  if (auth.idToken && !auth.me && !auth.loadingMe) refreshMe()
+  // Selalu cek ulang status absen ke server (di latar) setiap halaman ini dibuka.
+  if (auth.idToken && !auth.loadingMe) refreshMe()
 })
 onBeforeUnmount(() => clearInterval(timer))
 
@@ -33,6 +34,8 @@ async function hadir() {
   err.value = ''
   try {
     result.value = await authed('absen')
+    // Simpan juga di data profil bersama, agar tetap "TERCATAT" saat pindah halaman lalu kembali.
+    if (auth.me) auth.me.absenHariIni = { waktu: result.value.waktu }
   } catch (e) {
     err.value = e.message
   } finally {
